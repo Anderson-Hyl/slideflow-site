@@ -106,11 +106,16 @@ async function findSubscriptions(token, appId) {
       `&limit=200`,
   );
   const subs = (j.included ?? []).filter((x) => x.type === "subscriptions");
+  const inventory = subs
+    .map((s) => `${s.attributes?.productId} [${s.attributes?.subscriptionPeriod ?? "?"}]`)
+    .join(", ");
+  console.log(`[fetch-pricing] subscriptions in ASC: ${inventory || "(none)"}`);
+
   const byProduct = (pid) => subs.find((s) => s.attributes?.productId === pid);
   const m = byProduct(PRODUCT_MONTHLY);
   const y = byProduct(PRODUCT_YEARLY);
-  if (!m) softFail(`subscription not found: ${PRODUCT_MONTHLY}`);
-  if (!y) softFail(`subscription not found: ${PRODUCT_YEARLY}`);
+  if (!m) softFail(`subscription not found: ${PRODUCT_MONTHLY} (available: ${inventory || "none"})`);
+  if (!y) softFail(`subscription not found: ${PRODUCT_YEARLY} (available: ${inventory || "none"})`);
   return { monthlyId: m.id, yearlyId: y.id };
 }
 
