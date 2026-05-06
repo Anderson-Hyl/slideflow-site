@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { LegalPage, Section, ProseLink } from "@/components/legal/LegalPage";
 import { LEGAL_LAST_UPDATED, SUPPORT_URL } from "@/lib/constants";
+import { withBase } from "@/lib/paths";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — SlideFlow",
   description:
     "How SlideFlow handles your data: BYOK API keys stay in Keychain, decks stay on your device or in your iCloud, and nothing is proxied through our servers.",
-  alternates: { languages: { en: "/privacy", "zh-Hans": "/zh/privacy" } },
+  alternates: {
+    languages: {
+      en: withBase("/privacy"),
+      "zh-Hans": withBase("/zh/privacy"),
+    },
+  },
 };
 
 export default function PrivacyPage() {

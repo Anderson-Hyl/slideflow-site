@@ -5,12 +5,18 @@ import {
   PRICING,
   SUPPORT_URL,
 } from "@/lib/constants";
+import { withBase } from "@/lib/paths";
 
 export const metadata: Metadata = {
   title: "服务条款 — SlideFlow",
   description:
     "管辖你使用 SlideFlow 的条款,包含订阅、AI 输出免责声明与可接受使用规范。",
-  alternates: { languages: { en: "/terms", "zh-Hans": "/zh/terms" } },
+  alternates: {
+    languages: {
+      en: withBase("/terms"),
+      "zh-Hans": withBase("/zh/terms"),
+    },
+  },
 };
 
 export default function TermsPageZh() {

@@ -1,6 +1,7 @@
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RevealWrapper } from "@/components/ui/RevealWrapper";
 import type { Dictionary } from "@/lib/i18n";
+import { withBase } from "@/lib/paths";
 
 const stepIcons = [
   <svg key="0" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -104,7 +105,7 @@ export function HowItWorks({ dict }: HowItWorksProps) {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={stepImages[i].src}
+                    src={withBase(stepImages[i].src)}
                     alt={stepImages[i].alt}
                     className="w-full h-full object-cover"
                     loading="lazy"

@@ -1,6 +1,7 @@
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RevealWrapper } from "@/components/ui/RevealWrapper";
 import type { Dictionary } from "@/lib/i18n";
+import { withBase } from "@/lib/paths";
 
 const providers = [
   { name: "Anthropic",          dot: "#E8956D" },
@@ -71,7 +72,7 @@ export function Features({ dict }: FeaturesProps) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/screenshots/inspector-dark.png"
+                  src={withBase("/screenshots/inspector-dark.png")}
                   alt="SlideFlow inspector panel editing slide properties live"
                   className="w-full h-full object-cover"
                   loading="lazy"

@@ -5,12 +5,18 @@ import {
   PRICING,
   SUPPORT_URL,
 } from "@/lib/constants";
+import { withBase } from "@/lib/paths";
 
 export const metadata: Metadata = {
   title: "Terms of Service — SlideFlow",
   description:
     "Terms governing your use of SlideFlow, including subscription, AI-output disclaimers, and acceptable use.",
-  alternates: { languages: { en: "/terms", "zh-Hans": "/zh/terms" } },
+  alternates: {
+    languages: {
+      en: withBase("/terms"),
+      "zh-Hans": withBase("/zh/terms"),
+    },
+  },
 };
 
 export default function TermsPage() {

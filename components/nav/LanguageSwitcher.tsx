@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { LOCALES, type Locale } from "@/lib/i18n";
+import { withBase } from "@/lib/paths";
 
 const labels: Record<Locale, string> = {
   en: "EN",
@@ -25,8 +26,13 @@ export function LanguageSwitcher({ current }: LanguageSwitcherProps) {
    */
   const hrefFor = (target: Locale): string => {
     const stripped = pathname.replace(/^\/zh(?=\/|$)/, "") || "/";
-    if (target === "en") return stripped;
-    return stripped === "/" ? "/zh" : `/zh${stripped}`;
+    const path =
+      target === "en"
+        ? stripped
+        : stripped === "/"
+          ? "/zh"
+          : `/zh${stripped}`;
+    return withBase(path);
   };
 
   return (

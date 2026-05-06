@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { withBase } from "@/lib/paths";
 
 type Theme = "dark" | "light";
 
@@ -93,7 +94,7 @@ export function HeroScreenshot({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={t}
-            src={src}
+            src={withBase(src)}
             alt={alt}
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
             style={{ opacity: theme === t ? 1 : 0 }}

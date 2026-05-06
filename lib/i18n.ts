@@ -1,12 +1,15 @@
+import { withBase } from "./paths";
+
 export type Locale = "en" | "zh";
 
 export const LOCALES: readonly Locale[] = ["en", "zh"] as const;
 
-/** Path prefix for a locale. English is at root; Chinese is at /zh. */
+/** Path prefix for a locale. English is at root; Chinese is at /zh.
+ *  Result includes the deploy basePath when running on GitHub Pages. */
 export function localePath(locale: Locale, path = ""): string {
   const base = locale === "en" ? "" : `/${locale}`;
-  if (!path) return base || "/";
-  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+  if (!path) return withBase(base || "/");
+  return withBase(`${base}${path.startsWith("/") ? path : `/${path}`}`);
 }
 
 /** Substitute `{key}` placeholders in a translated string. */

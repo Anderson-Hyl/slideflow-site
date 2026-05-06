@@ -2,6 +2,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RevealWrapper } from "@/components/ui/RevealWrapper";
 import { HeroScreenshot } from "@/components/ui/HeroScreenshot";
 import type { Dictionary } from "@/lib/i18n";
+import { withBase } from "@/lib/paths";
 
 interface ShowcaseProps {
   dict: Dictionary["showcase"];
@@ -240,7 +241,7 @@ function PairedScreenshot({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={src}
+          src={withBase(src)}
           alt={alt}
           className="w-full h-full object-cover"
           loading="lazy"

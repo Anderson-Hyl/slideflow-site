@@ -1,3 +1,5 @@
+import { withBase } from "@/lib/paths";
+
 interface SlideFlowLogoProps {
   size?: number;
   className?: string;
@@ -7,7 +9,7 @@ export function SlideFlowLogo({ size = 32, className = "" }: SlideFlowLogoProps)
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/app-icon.png"
+      src={withBase("/app-icon.png")}
       alt="SlideFlow"
       width={size}
       height={size}

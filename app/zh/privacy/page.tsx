@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { LegalPage, Section, ProseLink } from "@/components/legal/LegalPage";
 import { LEGAL_LAST_UPDATED, SUPPORT_URL } from "@/lib/constants";
+import { withBase } from "@/lib/paths";
 
 export const metadata: Metadata = {
   title: "隐私政策 — SlideFlow",
   description:
-    "SlideFlow 如何处理你的数据:自带 API 密钥存储于钥匙串,幻灯片留在你的设备或 iCloud,任何内容都不经过我们的服务器。",
-  alternates: { languages: { en: "/privacy", "zh-Hans": "/zh/privacy" } },
+    "SlideFlow 如何处理你的数据:API 密钥保存在钥匙串,幻灯片留在你的设备或 iCloud,任何内容都不经过我们的服务器。",
+  alternates: {
+    languages: {
+      en: withBase("/privacy"),
+      "zh-Hans": withBase("/zh/privacy"),
+    },
+  },
 };
 
 export default function PrivacyPageZh() {

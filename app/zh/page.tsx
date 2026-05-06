@@ -6,6 +6,7 @@ import { Showcase } from "@/components/sections/Showcase";
 import { Pricing } from "@/components/sections/Pricing";
 import { Footer } from "@/components/sections/Footer";
 import { getDictionary } from "@/lib/i18n";
+import { withBase } from "@/lib/paths";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "用 Claude、Gemini、Groq 或 Apple 端侧智能,在实时 Reveal.js 画布上创作精美幻灯片。导出为网页、MP4、PDF 或 PNG。",
   alternates: {
-    languages: { "zh-Hans": "/zh", en: "/" },
+    languages: { "zh-Hans": withBase("/zh"), en: withBase("/") },
   },
 };
 
