@@ -80,12 +80,6 @@ async function asc(token, path) {
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
-const isCurrent = (a) =>
-  (!a.startDate || a.startDate <= today()) &&
-  (!a.endDate || a.endDate >= today());
-
-const pickIncluded = (included, type, id) =>
-  included.find((x) => x.type === type && x.id === id);
 
 async function findAppId(token) {
   const j = await asc(
@@ -134,55 +128,64 @@ async function findSubscriptions(token, appId) {
 }
 
 async function priceAndTrial(token, subId) {
-  const j = await asc(
+  // ── Active USD price ──────────────────────────────────────────────
+  // `/subscriptions/{id}/prices` supports `filter[territory]` and the
+  // simple `include=subscriptionPricePoint` sideload (not the nested form).
+  const pricesResp = await asc(
     token,
-    `/subscriptions/${subId}` +
-      `?include=prices,introductoryOffers,prices.subscriptionPricePoint,introductoryOffers.subscriptionPricePoint` +
-      `&fields[subscriptions]=productId,subscriptionPeriod,prices,introductoryOffers` +
-      `&fields[subscriptionPrices]=startDate,endDate,territory,subscriptionPricePoint` +
-      `&fields[subscriptionIntroductoryOffers]=startDate,endDate,duration,offerMode,numberOfPeriods,territory,subscriptionPricePoint` +
-      `&fields[subscriptionPricePoints]=customerPrice` +
-      `&limit=200`,
+    `/subscriptions/${subId}/prices?include=subscriptionPricePoint&filter[territory]=${TERRITORY}`,
   );
-  const inc = j.included ?? [];
+  const prices = pricesResp.data ?? [];
+  const included = pricesResp.included ?? [];
 
-  // Active USD price.
-  let usdPrice;
-  try {
-    usdPrice = inc
-      .filter((x) => x.type === "subscriptionPrices")
-      .filter((p) => p.relationships?.territory?.data?.id === TERRITORY)
-      .filter((p) => isCurrent(p.attributes ?? {}))
-      .map((p) => {
-        const ppId = p.relationships?.subscriptionPricePoint?.data?.id;
-        const pp = pickIncluded(inc, "subscriptionPricePoints", ppId);
-        return pp ? Number(pp.attributes.customerPrice) : null;
-      })
-      .find((v) => Number.isFinite(v));
-  } catch (err) {
-    softFail(`unable to parse price for sub ${subId}`, err.message);
+  if (prices.length === 0) {
+    softFail(`no ${TERRITORY} prices found for sub ${subId}`);
   }
+
+  const now = today();
+  // subscriptionPrices has only `startDate` — pick the most recent one whose
+  // start has already passed; that's the currently-active price.
+  const activePrice = prices
+    .filter((p) => !p.attributes?.startDate || p.attributes.startDate <= now)
+    .sort((a, b) =>
+      (b.attributes?.startDate ?? "").localeCompare(a.attributes?.startDate ?? ""),
+    )[0];
+
+  if (!activePrice) softFail(`no active ${TERRITORY} price for sub ${subId}`);
+
+  const ppId = activePrice.relationships?.subscriptionPricePoint?.data?.id;
+  const pp = included.find((x) => x.id === ppId);
+  if (!pp) softFail(`price point ${ppId} not sideloaded for sub ${subId}`);
+
+  const usdPrice = Number(pp.attributes?.customerPrice);
   if (!Number.isFinite(usdPrice)) {
-    softFail(`no current USD price for sub ${subId}`);
+    softFail(`invalid customerPrice for sub ${subId}: ${pp.attributes?.customerPrice}`);
   }
 
-  // Free-trial intro offer.
+  // ── Free-trial intro offer ────────────────────────────────────────
+  // `/subscriptions/{id}/introductoryOffers` doesn't filter by territory,
+  // so we fetch all and filter in code.
   let trialDays = 0;
   try {
-    trialDays =
-      inc
-        .filter((x) => x.type === "subscriptionIntroductoryOffers")
-        .filter((o) => o.relationships?.territory?.data?.id === TERRITORY)
-        .filter((o) => isCurrent(o.attributes ?? {}))
-        .filter((o) => o.attributes?.offerMode === "FREE_TRIAL")
-        .map(
-          (o) =>
-            (DURATION_DAYS[o.attributes.duration] ?? 0) *
-            (o.attributes.numberOfPeriods ?? 1),
-        )
-        .find((d) => d > 0) ?? 0;
-  } catch {
-    /* leave trialDays = 0; we'll use the other plan's value */
+    const offersResp = await asc(token, `/subscriptions/${subId}/introductoryOffers`);
+    const trial = (offersResp.data ?? []).find((o) => {
+      if (o.relationships?.territory?.data?.id !== TERRITORY) return false;
+      if (o.attributes?.offerMode !== "FREE_TRIAL") return false;
+      const start = o.attributes?.startDate;
+      const end = o.attributes?.endDate;
+      if (start && start > now) return false;
+      if (end && end < now) return false;
+      return true;
+    });
+    if (trial) {
+      const days = DURATION_DAYS[trial.attributes?.duration] ?? 0;
+      const periods = trial.attributes?.numberOfPeriods ?? 1;
+      trialDays = days * periods;
+    }
+  } catch (err) {
+    console.warn(
+      `[fetch-pricing] could not fetch intro offers for sub ${subId}: ${err?.message ?? err}`,
+    );
   }
 
   return { price: usdPrice, trialDays };
