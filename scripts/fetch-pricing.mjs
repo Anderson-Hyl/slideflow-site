@@ -200,6 +200,21 @@ async function main() {
     },
   };
 
+  console.log(
+    "[fetch-pricing] live values from ASC:",
+    JSON.stringify(
+      {
+        freeTrialDays: payload.freeTrialDays,
+        monthly: payload.monthly.display,
+        annual: payload.annual.display,
+        monthlyEquivalent: payload.annual.monthlyEquivalent,
+        savePercent: payload.annual.savePercent,
+      },
+      null,
+      2,
+    ),
+  );
+
   // Stable diff: only rewrite when something actually changed.
   let prev = null;
   try {
@@ -214,13 +229,16 @@ async function main() {
     prev.annual?.price === payload.annual.price;
 
   if (same) {
-    console.log("[fetch-pricing] no change");
+    console.log(
+      "[fetch-pricing] committed JSON already matches ASC — no rewrite needed",
+    );
     return;
   }
 
   await writeFile(OUT_PATH, JSON.stringify(payload, null, 2) + "\n");
-  console.log("[fetch-pricing] wrote", OUT_PATH);
-  console.log(payload);
+  console.log(
+    `[fetch-pricing] rewrote ${OUT_PATH} (committed JSON had: monthly=$${prev?.monthly?.price}, annual=$${prev?.annual?.price}, trial=${prev?.freeTrialDays}d)`,
+  );
 }
 
 main().catch((e) => softFail("unexpected error", e?.stack ?? e));
