@@ -20,6 +20,7 @@
     "@types/react-dom": "^19",
     "jsonwebtoken": "^9.0.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.88.0"
   }
 }
