@@ -97,21 +97,35 @@ async function findAppId(token) {
 }
 
 async function findSubscriptions(token, appId) {
-  const j = await asc(
+  // 1. List all subscription groups for the app.
+  const groupsResp = await asc(
     token,
-    `/apps/${appId}/subscriptionGroups` +
-      `?include=subscriptions` +
-      `&fields[subscriptionGroups]=referenceName,subscriptions` +
-      `&fields[subscriptions]=productId,subscriptionPeriod` +
-      `&limit=200`,
+    `/apps/${appId}/subscriptionGroups?fields[subscriptionGroups]=referenceName&limit=200`,
   );
-  const subs = (j.included ?? []).filter((x) => x.type === "subscriptions");
-  const inventory = subs
+  const groups = groupsResp.data ?? [];
+  console.log(
+    `[fetch-pricing] subscription groups (${groups.length}): ${
+      groups.map((g) => `${g.attributes?.referenceName ?? "?"} (${g.id})`).join(", ") || "(none)"
+    }`,
+  );
+
+  // 2. For each group, fetch all subscriptions explicitly (don't rely on
+  //    `?include=subscriptions` sideload which can return partial lists).
+  const allSubs = [];
+  for (const group of groups) {
+    const subsResp = await asc(
+      token,
+      `/subscriptionGroups/${group.id}/subscriptions?fields[subscriptions]=productId,subscriptionPeriod&limit=200`,
+    );
+    for (const s of subsResp.data ?? []) allSubs.push(s);
+  }
+
+  const inventory = allSubs
     .map((s) => `${s.attributes?.productId} [${s.attributes?.subscriptionPeriod ?? "?"}]`)
     .join(", ");
   console.log(`[fetch-pricing] subscriptions in ASC: ${inventory || "(none)"}`);
 
-  const byProduct = (pid) => subs.find((s) => s.attributes?.productId === pid);
+  const byProduct = (pid) => allSubs.find((s) => s.attributes?.productId === pid);
   const m = byProduct(PRODUCT_MONTHLY);
   const y = byProduct(PRODUCT_YEARLY);
   if (!m) softFail(`subscription not found: ${PRODUCT_MONTHLY} (available: ${inventory || "none"})`);
