@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Surfaces ──────────────────────────────────────── */
+  --color-bg-base:     #060606;
+  --color-bg-elevated: #0f0f0f;
+  --color-bg-subtle:   #141414;
+  --color-bg-card:     #111111;
+
+  /* ── Brand (anchored on app accents) ──────────────── */
+  --color-brand-blue: #7AA5FA;  /* dark-mode app accent (primary on dark bg) */
+  --color-brand-deep: #4C81DD;  /* light-mode app accent (gradient depth)   */
+
+  /* ── Text scale ───────────────────────────────────── */
+  --color-text-primary:   #F0F0F0;
+  --color-text-secondary: #888888;
+  --color-text-muted:     #4A4A4A;
+
+  /* ── Structural ───────────────────────────────────── */
+  --color-border:        rgba(255, 255, 255, 0.07);
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+
+  /* ── Typography ───────────────────────────────────── */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* ── Radii ────────────────────────────────────────── */
+  --radius-card: 1.25rem;
+  --radius-pill: 9999px;
+  --radius-btn:  0.625rem;
+
+  /* ── Shadows ──────────────────────────────────────── */
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 8px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 120px 40px rgba(122, 165, 250, 0.08);
+}
+
+/* ── Gradient utilities ─────────────────────────────── */
+/* Solid surfaces (buttons, badges) — keeps white text readable */
+.gradient-brand {
+  background: linear-gradient(
+    135deg,
+    #2d5ab3 0%,
+    #4c81dd 30%,
+    #5c8fe6 60%,
+    #7aa5fa 100%
+  );
+}
+
+/* Decorative gradient text — pure blue with a slow live shimmer */
+.gradient-brand-text {
+  background: linear-gradient(
+    110deg,
+    #4c81dd 0%,
+    #7aa5fa 50%,
+    #4c81dd 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: brand-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes brand-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ── Background orb drift (very slow, near-imperceptible) ─ */
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(2%, -2%) scale(1.04);
+  }
+}
+
+.orb-animated {
+  animation: orb-drift 18s ease-in-out infinite;
+}
+
+/* ── Site-wide mesh gradient (atmospheric backdrop) ── */
+/* Five radial blobs in the brand-blue / periwinkle family. Fixed-attached
+   so the mesh stays glued to the viewport while content scrolls — feels
+   like ambient lighting rather than a decorated background. */
+body {
+  background-image:
+    radial-gradient(
+      ellipse 70% 45% at 12% -8%,
+      rgba(76, 129, 221, 0.20),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 88% 6%,
+      rgba(122, 165, 250, 0.16),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 50% 45% at 97% 48%,
+      rgba(165, 153, 255, 0.09),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 4% 92%,
+      rgba(45, 90, 179, 0.18),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 70% 35% at 58% 104%,
+      rgba(122, 165, 250, 0.11),
+      transparent 60%
+    );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ── Scroll reveal ──────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Respect users who prefer reduced motion ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-brand-text,
+  .orb-animated {
+    animation: none;
+  }
+  .reveal {
+    transition: none;
+  }
+}
