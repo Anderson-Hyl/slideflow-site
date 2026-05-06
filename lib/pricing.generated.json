@@ -1,0 +1,16 @@
+{
+  "fetchedAt": "2026-05-06T00:00:00.000Z",
+  "freeTrialDays": 7,
+  "monthly": {
+    "price": 9.99,
+    "currency": "USD",
+    "display": "$9.99"
+  },
+  "annual": {
+    "price": 79.99,
+    "currency": "USD",
+    "display": "$79.99",
+    "monthlyEquivalent": "$6.67",
+    "savePercent": 33
+  }
+}

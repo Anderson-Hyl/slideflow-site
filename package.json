@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "node scripts/fetch-pricing.mjs && next build",
+    "start": "next start",
+    "fetch:pricing": "node scripts/fetch-pricing.mjs"
   },
   "dependencies": {
     "next": "16.2.4",
@@ -17,6 +18,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jsonwebtoken": "^9.0.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
