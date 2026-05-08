@@ -1,0 +1,60 @@
+name: Refresh pricing
+
+# Re-fetches live subscription pricing from App Store Connect and commits
+# the result to lib/pricing.generated.json. Cloudflare's Git integration
+# then auto-deploys the resulting commit.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/fetch-pricing.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/refresh-pricing.yml"
+  schedule:
+    # Daily at 03:17 UTC — picks up ASC price changes without a code push.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Avoid racing parallel runs writing to the same file.
+concurrency:
+  group: refresh-pricing
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch pricing from App Store Connect
+        run: npm run fetch:pricing
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+
+      - name: Commit updated pricing JSON
+        run: |
+          if git diff --quiet -- lib/pricing.generated.json; then
+            echo "No pricing changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/pricing.generated.json
+          git commit -m "chore: refresh pricing from App Store Connect"
+          git push
