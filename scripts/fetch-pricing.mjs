@@ -18,8 +18,8 @@ import jwt from "jsonwebtoken";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const BUNDLE_ID = "com.stareraadaspace.slide-flow";
-const PRODUCT_MONTHLY = "pro_monthly_v1";
-const PRODUCT_YEARLY = "pro_yearly_v1";
+const PRODUCT_MONTHLY = "monthly_pro_v1";
+const PRODUCT_YEARLY = "yearly_pro_v1";
 const TERRITORY = "USA";
 const OUT_PATH = resolve(__dirname, "../lib/pricing.generated.json");
 const API = "https://api.appstoreconnect.apple.com/v1";
