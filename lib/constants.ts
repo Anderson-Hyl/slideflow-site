@@ -50,4 +50,4 @@ export const PRICING: PricingShape =
     : FALLBACK;
 
 /** Last revision date for the legal pages — update when you edit the copy. */
-export const LEGAL_LAST_UPDATED = "May 6, 2026";
+export const LEGAL_LAST_UPDATED = "May 11, 2026";
