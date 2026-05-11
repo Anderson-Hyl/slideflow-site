@@ -1,8 +1,8 @@
 name: Refresh pricing
 
-# Re-fetches live subscription pricing from App Store Connect and commits
-# the result to lib/pricing.generated.json. Cloudflare's Git integration
-# then auto-deploys the resulting commit.
+# Re-fetches live subscription pricing from App Store Connect and opens a
+# PR with the updated lib/pricing.generated.json. Merging the PR triggers
+# the GitHub Pages deploy workflow.
 on:
   push:
     branches: [main]
